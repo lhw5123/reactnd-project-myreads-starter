@@ -9,14 +9,8 @@ import Book from './Book'
  * 用于展示图书列表。
  */
 class BooksGallery extends Component {
-
-  onBookSelectReadState = state => {
-
-  }
-
   render () {
-    const {books, title, bookState} = this.props
-
+    const {books, title, onUpdateBookShelf} = this.props
     return (
       <div className="list-books-content">
         <div>
@@ -25,8 +19,8 @@ class BooksGallery extends Component {
             <div className="bookshelf-books">
               <ol className="books-grid">
                 {books.map(book => (
-                  <li>
-                    <Book book={book} onSelectReadState={this.onBookSelectReadState}/>
+                  <li key={book.id}>
+                    <Book book={book} onUpdateBookShelf={onUpdateBookShelf}/>
                   </li>
                 ))}
               </ol>

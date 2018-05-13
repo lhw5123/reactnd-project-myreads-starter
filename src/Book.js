@@ -10,14 +10,22 @@ import * as BooksAPI from './BooksAPI'
  */
 class Book extends Component {
 
-  state = {shelf: ''}
+  state = {shelf: this.props.book.shelf}
 
-  /**
-   * 更新选中图书的阅读状态。
-   * @param shelf 阅读状态。可能为：'currentlyReading', 'wantToRead', 'read'。
-   */
-  updateBookReadState = (book, shelf) => {
-    BooksAPI.update(book, shelf)
+  updateBookReadShelf = (newShelf) => {
+    let book = this.props.book
+    if (book.shelf !== newShelf) {
+          this.setState({shelf: newShelf})
+          // 将参数回调给父组件。
+          this.props.onUpdateBookShelf(book, newShelf)
+
+      // BooksAPI.update(book, newShelf)
+      //   .then(() => {
+      //     this.setState({shelf: newShelf})
+      //     // 将参数回调给父组件。
+      //     this.props.onUpdateBookShelf(book, newShelf)
+      //   })
+    }
   }
 
   render () {
@@ -31,24 +39,12 @@ class Book extends Component {
                style={{width: 128, height: 178, backgroundImage: `url(${book.imageLinks.thumbnail})`}}>
           </div>
           <div className="book-shelf-changer">
-            <select>
+            <select value={shelf} onChange={event => this.updateBookReadShelf(event.target.value)}>
               <option value="none" disabled>Move to...</option>
-              <option value="currentlyReading" selected={shelf === 'currentlyReading'}
-                      onClick={() => {this.updateBookReadState(book, 'currentlyReading')}}>
-                Currently Reading
-              </option>
-              <option value="wantToRead" selected={shelf === 'wantToRead'}
-                      onClick={() => {this.updateBookReadState(book, 'wantToRead')}}>
-                Want to Read
-              </option>
-              <option value="read" selected={shelf === 'read'}
-                      onClick={() => {this.updateBookReadState(book, 'read')}}>
-                Read
-              </option>
-              <option value="none" selected={shelf === ''}
-                      onClick={() => {this.updateBookReadState(book, '')}}>
-                None
-              </option>
+              <option value="currentlyReading">Currently Reading</option>
+              <option value="wantToRead">Want to Read</option>
+              <option value="read">Read</option>
+              <option value="">None</option>
             </select>
           </div>
         </div>
