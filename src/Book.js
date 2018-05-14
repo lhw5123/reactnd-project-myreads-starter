@@ -10,22 +10,33 @@ import * as BooksAPI from './BooksAPI'
  */
 class Book extends Component {
 
-  state = {shelf: this.props.book.shelf}
+  state = {shelf: ''}
 
   updateBookReadShelf = (newShelf) => {
     let book = this.props.book
     if (book.shelf !== newShelf) {
-          this.setState({shelf: newShelf})
-          // 将参数回调给父组件。
+      BooksAPI.update(book, newShelf).then(() => {
+        this.setState({shelf: newShelf})
+        // 将参数回调给父组件。
+        if (this.props.onUpdateBookShelf) {
           this.props.onUpdateBookShelf(book, newShelf)
-
-      // BooksAPI.update(book, newShelf)
-      //   .then(() => {
-      //     this.setState({shelf: newShelf})
-      //     // 将参数回调给父组件。
-      //     this.props.onUpdateBookShelf(book, newShelf)
-      //   })
+        }
+      })
     }
+  }
+
+  componentDidMount () {
+    let bookShelf
+    if (this.props.book.shelf === undefined) {
+      bookShelf = ''
+    } else {
+      bookShelf = this.props.book.shelf
+    }
+    this.setState({shelf: bookShelf})
+  }
+
+  componentWillUnmount () {
+
   }
 
   render () {

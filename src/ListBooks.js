@@ -5,19 +5,29 @@
 import React, { Component } from 'react'
 import BooksGallery from './BooksGallery'
 import { Link } from 'react-router-dom'
+import * as BooksAPI from './BooksAPI'
 
 const BOOK_SHELF = ['currentlyReading', 'wantToRead', 'read']
 
 class ListBooks extends Component {
 
+  state = {books: []}
+
   onUpdateBookShelf (book, newShelf) {
-    let index = this.props.books.indexOf(book)
-    this.props.books[index].shelf = newShelf
-    this.setState({})
+    let books = this.state.books
+    let index = books.indexOf(book)
+    books[index].shelf = newShelf
+    this.setState({books: books})
+  }
+
+  componentDidMount () {
+    BooksAPI.getAll().then(books => {
+      this.setState({books: books})
+    })
   }
 
   render () {
-    const {books} = this.props
+    const {books} = this.state
     let currentlyReadingBooks = books.filter(b => b.shelf === BOOK_SHELF[0])
     let wantToReadBooks = books.filter(b => b.shelf === BOOK_SHELF[1])
     let readBooks = books.filter(b => b.shelf === BOOK_SHELF[2])

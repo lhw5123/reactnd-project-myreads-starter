@@ -4,10 +4,12 @@
 
 import React, { Component } from 'react'
 import Book from './Book'
+import PropTypes from 'prop-types'
 
 /**
  * 用于展示图书列表。
  */
+
 class BooksGallery extends Component {
   render () {
     const {books, title, onUpdateBookShelf} = this.props
@@ -18,11 +20,13 @@ class BooksGallery extends Component {
             <h2 className="bookshelf-title">{title}</h2>
             <div className="bookshelf-books">
               <ol className="books-grid">
-                {books.map(book => (
-                  <li key={book.id}>
-                    <Book book={book} onUpdateBookShelf={onUpdateBookShelf}/>
-                  </li>
-                ))}
+                {(books instanceof Array) && (
+                  books.map(book => (
+                    <li key={book.id}>
+                      <Book book={book} onUpdateBookShelf={onUpdateBookShelf}/>
+                    </li>
+                  ))
+                )}
               </ol>
             </div>
           </div>
@@ -30,6 +34,10 @@ class BooksGallery extends Component {
       </div>
     )
   }
+}
+
+BooksGallery.propTypes = {
+  books: PropTypes.array.isRequired
 }
 
 export default BooksGallery

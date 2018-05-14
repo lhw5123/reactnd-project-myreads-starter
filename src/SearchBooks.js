@@ -3,47 +3,57 @@
  */
 
 import React, { Component } from 'react'
-import ListBooks from './BooksGallery'
-import escapeRegExp from 'escape-string-regexp'
+import BooksGallery from './BooksGallery'
 import { Link } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 
 class SearchBooks extends Component {
 
-  state = {query: '', showingBooks: []}
+  state = {query: '', queryBooks: [], books: []}
 
-  updateQuery = query => {
+  updateQuery = (query) => {
+    this.setState({query: query.trim()})
+    let {books} = this.state
+
     BooksAPI.search(query)
-      .then(books => this.setState({showingBooks: books}))
-    // this.setState({query: query.trim()})
+      .then(queryBooks => {
+        if (!Array.isArray(queryBooks)) {
+          queryBooks = []
+        }
+        // 求查询得到的数组和已有数组的交集。
+        queryBooks.map(b => {
+          for (let i = 0; i < books.length; i++) {
+            if (books[i].id === b.id) {
+              b.shelf = books[i].shelf
+            }
+          }
+        })
+        this.setState({queryBooks: queryBooks})
+      })
+  }
+
+  componentDidMount () {
+    BooksAPI.getAll().then(books => {
+      this.setState({books: books})
+    })
   }
 
   render () {
-    const {query, showingBooks} = this.state
-    //
-    // let showingBooks
-    // if (query) {
-    //   const match = new RegExp(escapeRegExp(query), 'i')
-    //   let matchTitleBooks = books.filter(b => match.test(b.title))
-    //   let matchAuthorsBooks = books.filter(b => match.test(b.authors))
-    //   showingBooks = matchTitleBooks.concat(matchAuthorsBooks.filter(b => !matchTitleBooks.includes(b)))
-    // } else {
-    //   showingBooks = []
-    // }
+    const {query, queryBooks} = this.state
 
     return (
       <div className="search-books">
         <div className="search-books-bar">
-          <Link exact to="/" className="close-search">Close</Link>
+          <Link to="/" className="close-search">Close</Link>
           <div className="search-books-input-wrapper">
             <input type="text"
                    value={query}
-                   onChange={event => this.updateQuery(event.target.value)}
+                   onChange={(event) => this.updateQuery(event.target.value)}
                    placeholder="Search by title or author"/>
           </div>
         </div>
         <div className="search-books-results">
-          <ListBooks books={showingBooks}/>
+          <BooksGallery books={queryBooks}/>
         </div>
       </div>
     )
