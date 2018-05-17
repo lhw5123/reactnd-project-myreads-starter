@@ -3,9 +3,28 @@ import './App.css'
 import ListBooks from './ListBooks'
 import { Route } from 'react-router-dom'
 import SearchBooks from './SearchBooks'
+import * as BooksAPI from './BooksAPI'
 
 class BooksApp extends Component {
+
+  state = {books: []}
+
+  componentDidMount () {
+    BooksAPI.getAll().then(books => {
+      this.setState({books: books})
+    })
+  }
+
+  onUpdateBookShelf (book, newShelf) {
+    let updatedBook = {...book, shelf: newShelf}
+    this.setState(prevState => ({
+      books: [...prevState.books.filter(b => b.id !== updatedBook.id), updatedBook]
+    }))
+  }
+
   render () {
+    const {books} = this.state
+
     return (
       <div className="app">
         <div className="list-books">
@@ -14,11 +33,11 @@ class BooksApp extends Component {
           </div>
 
           <Route exact path="/" render={() => (
-            <ListBooks/>
+            <ListBooks books={books} onUpdateBookShelf={(book, newShelf) => this.onUpdateBookShelf(book, newShelf)}/>
           )}/>
 
           <Route path="/search" render={({history}) => (
-            <SearchBooks/>
+            <SearchBooks books={books} onUpdateBookShelf={(book, newShelf) => this.onUpdateBookShelf(book, newShelf)}/>
           )}/>
         </div>
       </div>

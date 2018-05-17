@@ -9,33 +9,30 @@ import * as BooksAPI from './BooksAPI'
 
 class SearchBooks extends Component {
 
-  state = {query: '', queryBooks: [], books: []}
+  state = {query: '', queryBooks: []}
 
   updateQuery = (query) => {
     this.setState({query: query.trim()})
-    let {books} = this.state
+    let {books} = this.props
 
     BooksAPI.search(query)
-      .then(queryBooks => {
-        if (!Array.isArray(queryBooks)) {
-          queryBooks = []
-        }
-        // 求查询得到的数组和已有数组的交集。
-        queryBooks.map(b => {
-          for (let i = 0; i < books.length; i++) {
-            if (books[i].id === b.id) {
-              b.shelf = books[i].shelf
-            }
-          }
-        })
-        this.setState({queryBooks: queryBooks})
-      })
-  }
+      .then(result => {
+        console.log(result)
 
-  componentDidMount () {
-    BooksAPI.getAll().then(books => {
-      this.setState({books: books})
-    })
+        if (result.error === 'empty query') {
+          result = []
+        } else {
+          // 求查询得到的 Book 数组和已有 Book 数组的交集，并更新其状态。
+          result.map(b => {
+            for (let i = 0; i < books.length; i++) {
+              if (books[i].id === b.id) {
+                b.shelf = books[i].shelf
+              }
+            }
+          })
+        }
+        this.setState({queryBooks: result})
+      })
   }
 
   render () {
@@ -53,7 +50,8 @@ class SearchBooks extends Component {
           </div>
         </div>
         <div className="search-books-results">
-          <BooksGallery books={queryBooks}/>
+          <BooksGallery books={queryBooks}
+                        onUpdateBookShelf={this.props.onUpdateBookShelf}/>
         </div>
       </div>
     )
